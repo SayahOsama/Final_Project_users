@@ -1,13 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import User from "./models/users.js";
-import { start } from "repl";
-import { ifError } from "assert";
-import jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
-import mongoose from "mongoose";
-import * as dotenv from "dotenv";
-
+import { PublisherChannel } from "./publisher-channel.js";
 
 const parseSearchParams = (url: string): { [key: string]: string } => {
   const searchParams: { [key: string]: string } = {};
@@ -47,7 +41,7 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
   return;
 };
 
-export const deleteOrder = (req: IncomingMessage, res: ServerResponse) => {
+export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherChannel: PublisherChannel) => {
 
   let id;
   const { url } = req;
@@ -100,6 +94,9 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse) => {
         res.end("Order does not exist for this user.");
         return;
       }
+
+      // Publish event:
+      await publisherChannel.sendEvent(JSON.stringify(user.orders[orderIndex]));
       
       // Remove the order from the array
       user.orders.splice(orderIndex, 1);
@@ -209,7 +206,9 @@ export const getOrders = async (req: IncomingMessage, res: ServerResponse) => {
   try{
     const user = await User.findById(id);
     if(user){
-      const orders = user.orders.slice(skip, skip + limit);
+      // Sort orders by timeOfPurchase in descending order
+      const sortedOrders = user.orders.sort((a, b) => b.timeOfPurchase - a.timeOfPurchase);
+      const orders = sortedOrders.slice(skip, skip + limit);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(orders));

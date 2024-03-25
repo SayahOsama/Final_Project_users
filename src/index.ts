@@ -2,6 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import * as mongoose from "mongoose";
 import * as dotenv from "dotenv";
 import { createOrder, createUser, deleteOrder, getOrders, getUserByIdOrName, mainRoute, updatePrivileges } from "./routes.js";
+import { PublisherChannel } from './publisher-channel.js';
 
 // For environment-variables
 dotenv.config();
@@ -10,6 +11,8 @@ const port = process.env.PORT;
 // Connect to mongoDB
 const dbURI = `mongodb+srv://${process.env.DBUSER}:${process.env.DBPASS}@pws.jqme9mr.mongodb.net/Final_Project`;
 await mongoose.connect(dbURI);
+
+const publisherChannel = new PublisherChannel();
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   
@@ -23,7 +26,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       return;
     }
     if(req.method === "DELETE"){
-      deleteOrder(req,res);
+      deleteOrder(req,res,publisherChannel);
       return;
     }
   }
