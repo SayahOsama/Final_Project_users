@@ -232,7 +232,7 @@ export const getUserByIdOrName = async (req: IncomingMessage, res: ServerRespons
   let user;
   try{
     const id = IdOrName;
-    user = await User.findById(id);
+    user = await User.findById(id).select('-orders');
     if(user){
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
@@ -242,7 +242,7 @@ export const getUserByIdOrName = async (req: IncomingMessage, res: ServerRespons
   }catch(error){}
   
   try{
-    user = await User.findOne({ username: IdOrName });
+    user = await User.findOne({ username: IdOrName }).select('-orders');
   }catch(error){
     res.statusCode = 400;
     res.end(error.message);
