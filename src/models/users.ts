@@ -1,7 +1,7 @@
 import * as mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    orderID: { String, required: true},
+    orderID: { type: String, required: true},
     eventID: { type: mongoose.Schema.Types.ObjectId, required: true},
     ticketType: { type: String, required: true},
     ticketQuantity: { type: Number, required: true},
