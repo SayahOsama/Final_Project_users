@@ -86,7 +86,7 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherC
       }
 
        // Find the index of the order to delete
-       const orderIndex = user.orders.findIndex(order => order.orderID.equals(orderToDelete));
+       const orderIndex = user.orders.findIndex(order => order._id.equals(orderToDelete));
       
       // Check if the order exists
       if (orderIndex === -1) {
