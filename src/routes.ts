@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import User from "./models/users.js";
 import * as bcrypt from "bcrypt";
 import { PublisherChannel } from "./publisher-channel.js";
+import mongoose from "mongoose";
 
 const parseSearchParams = (url: string): { [key: string]: string } => {
   const searchParams: { [key: string]: string } = {};
@@ -41,6 +42,46 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
   return;
 };
 
+export const getNextEvent = async (req: IncomingMessage, res: ServerResponse) => {
+  let id;
+  const { url } = req;
+  if (url) {
+    const urlParts = url.split("/");
+    const Id = urlParts.indexOf("nextEvent") + 1;
+    id = decodeURIComponent(urlParts[Id]);
+  }
+  try{
+    const currentTime = new Date();
+    // Aggregation pipeline to find the nearest order for the given username
+    const ObjectId = mongoose.Types.ObjectId; // Get the ObjectId constructor
+    const objectId = new ObjectId(id);
+    const nearestOrder = await User.aggregate([
+      { $match: { _id: objectId } }, // Match the user by id
+      { $unwind: '$orders' }, // Deconstruct the orders array
+      { $match: { 'orders.start_date': { $gt: currentTime } } }, // Filter orders with start_date greater than or equal to current time
+      { $sort: { 'orders.start_date': 1 } }, // Sort orders by start_date in ascending order
+      { $limit: 1 }, // Limit to the first order (nearest to the current time)
+      { $project: { _id: null, eventID: '$orders.eventID' } } // Project only the eventID field
+    ]);
+
+    if (nearestOrder.length === 0) {
+      res.statusCode = 404;
+      res.end('No future orders found for the user');
+      return;
+    }
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({eventID: nearestOrder[0].eventID}));
+    return;
+
+  }catch(error){
+    res.statusCode = 400;
+    res.end(error.message);
+    return;
+  }
+};
+
 export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherChannel: PublisherChannel) => {
 
   let id;
@@ -78,34 +119,41 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherC
    
     try {
       // Find the user by ID
-      const user = await User.findById(id);
+      const user = await User.findById(id).select('-orders');
       if (!user) {
           res.statusCode = 404;
           res.end("User does not exist.");
           return;
       }
 
-       // Find the index of the order to delete
-       const orderIndex = user.orders.findIndex(order => order._id.equals(orderToDelete));
-      
-      // Check if the order exists
-      if (orderIndex === -1) {
-        res.statusCode = 404;
-        res.end("Order does not exist for this user.");
-        return;
+      const ObjectId = mongoose.Types.ObjectId; // Get the ObjectId constructor
+      const objectOrderId = new ObjectId(orderToDelete);
+      const objectId = new ObjectId(id);
+
+      const order = await User.aggregate([
+        { $match: { _id: objectId } }, // Match the user by ID
+        { $unwind: '$orders' }, // Unwind the orders array
+        { $match: { 'orders._id': objectOrderId } } // Match the order by its orderID
+      ]);
+      if (order.length > 0) {
+         // Publish event:
+        await publisherChannel.sendEvent(JSON.stringify(order[0].orders));
       }
 
-      // Publish event:
-      await publisherChannel.sendEvent(JSON.stringify(user.orders[orderIndex]));
-      
-      // Remove the order from the array
-      user.orders.splice(orderIndex, 1);
+      // Update the user document to pull the order from the orders array
+      const result = await User.updateOne(
+        { _id: objectId }, // Assuming `id` is the user's ID
+        { $pull: { orders: { _id: objectOrderId } } } // Assuming `orderToDelete` is the ID of the order to delete
+      );
 
-      // Save the updated user document
-      await user.save();
-
-      res.statusCode = 204; // deleted the order!
-      res.end("Order Deleted successfully.");
+      // Check if the update was successful
+      if (result.modifiedCount  === 1) {
+          res.statusCode = 204; // Deleted successfully
+          res.end("Order deleted successfully.");
+      } else {
+          res.statusCode = 404; // No order found for deletion
+          res.end("Order not found for deletion.");
+      }
       } catch (error) {
           console.error("Error Deleting order:", error);
           res.statusCode = 500;
@@ -140,7 +188,7 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
     }
 
     const bodyKeys = Object.keys(order);
-    if (!bodyKeys.includes("orderID") || !bodyKeys.includes("eventID") || !bodyKeys.includes("ticketType") || !bodyKeys.includes("ticketQuantity")) {
+    if (!bodyKeys.includes("start_date") || !bodyKeys.includes("orderID") || !bodyKeys.includes("eventID") || !bodyKeys.includes("ticketType") || !bodyKeys.includes("ticketQuantity")) {
       res.statusCode = 400;
       res.end("Request body must contain the required fields.");
       return;
@@ -150,10 +198,11 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
     const eventID = order.eventID;
     const ticketType = order.ticketType;
     const ticketQuantity = order.ticketQuantity;
+    const start_date = order.start_date;
    
     try {
       // Find the user by ID
-      const user = await User.findById(id);
+      const user = await User.findById(id).select('-orders');
       if (!user) {
           res.statusCode = 404;
           res.end("User does not exist.");
@@ -166,14 +215,21 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
           eventID: eventID,
           ticketType: ticketType,
           ticketQuantity: ticketQuantity,
+          start_date: start_date,
       };
 
-      // Add the new order to the user's orders array
-      user.orders.push(newOrder);
-
-      // Save the updated user document
-      await user.save();
-
+      // Update the user document to push the new order to the orders array
+      const ObjectId = mongoose.Types.ObjectId; // Get the ObjectId constructor
+      const objectId = new ObjectId(id);
+      const result = await User.updateOne(
+        { _id: id },
+        { $push: { orders: newOrder } }
+      );
+      if (!result) {
+        res.statusCode = 500;
+        res.end("failed to create new order.");
+        return;
+    }
       res.statusCode = 201; // Created a new order!
       res.end("Order created successfully.");
       } catch (error) {
@@ -204,16 +260,20 @@ export const getOrders = async (req: IncomingMessage, res: ServerResponse) => {
     id = decodeURIComponent(urlParts[IdOrNameIndex]);
   }
   try{
-    const user = await User.findById(id);
-    if(user){
-      // Sort orders by timeOfPurchase in descending order
-      const sortedOrders = user.orders.sort((a, b) => b.timeOfPurchase - a.timeOfPurchase);
-      const orders = sortedOrders.slice(skip, skip + limit);
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(orders));
-      return;
-    }
+    const ObjectId = mongoose.Types.ObjectId; // Get the ObjectId constructor
+    const userIdObj = new ObjectId(id);
+    const orders = await User.aggregate([
+      { $match: { _id: userIdObj } },
+      { $unwind: "$orders" },
+      { $sort: { "orders.timeOfPurchase": -1 } }, // Sort orders by timeOfPurchase in descending order
+      { $skip: skip }, // Skip records
+      { $limit: limit }, // Limit records
+      { $replaceRoot: { newRoot: "$orders" } } // Replace the root document with the orders
+    ]);
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(orders));
   }catch(error){
     res.statusCode = 400;
     res.end(error.message);
@@ -294,7 +354,7 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
 
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ username }).select('-orders');
     if (existingUser) {
       res.statusCode = 400;
       res.end("Username already exists");
@@ -342,10 +402,10 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
       res.end("Request body must contain only 'username' and 'permission' fields.");
       return;
     }
-    const loggedUser = await User.findById(privilege.userID);
+    const loggedUser = await User.findById(privilege.userID).select('-orders');
     const username = privilege.username;
     const permission = privilege.permission;
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ username }).select('-orders');
     if(username == "admin"){
       res.statusCode = 400;
       res.end("cant update admin permission");
@@ -357,7 +417,7 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
     
-
+    console.log(loggedUser);
     if(loggedUser.permission && loggedUser.permission != "A"){
       res.statusCode = 403;
       res.end("you lack sufficient permissions to update privilege.");
