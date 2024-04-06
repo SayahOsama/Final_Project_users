@@ -392,7 +392,7 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
 
-    if(permission != "M" && permission != "W"){
+    if(permission != "M" && permission != "W" && permission != "W"){
       res.statusCode = 400;
       res.end("there is no such permission.");
       return;
