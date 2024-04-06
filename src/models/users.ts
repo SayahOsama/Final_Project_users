@@ -6,7 +6,6 @@ const orderSchema = new mongoose.Schema({
     ticketType: { type: String, required: true},
     ticketQuantity: { type: Number, required: true},
     timeOfPurchase: { type: Date, default: Date.now, required: true},
-    start_date: {type: Date, required: true}
 });
 
 const userSchema = new mongoose.Schema({
