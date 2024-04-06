@@ -39,7 +39,7 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
               <li>DELETE /api/user/orders/{id} - Delete order by user ID (for refunds).</li>
             </ul>`);
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -49,7 +49,7 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
 
 export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherChannel: PublisherChannel) => {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -133,7 +133,7 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherC
 
 export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
- res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -215,7 +215,7 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
 
 export const getOrders = async (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
- res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -261,7 +261,7 @@ export const getOrders = async (req: IncomingMessage, res: ServerResponse) => {
 
 export const getUserByIdOrName = async (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -302,7 +302,7 @@ export const getUserByIdOrName = async (req: IncomingMessage, res: ServerRespons
 
 export const createUser = (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -370,7 +370,7 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
 
 export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', 'https://osama-sayah.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
