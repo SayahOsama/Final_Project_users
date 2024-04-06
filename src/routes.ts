@@ -40,7 +40,7 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
             </ul>`);
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.end();
   return;
@@ -49,7 +49,7 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
 export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherChannel: PublisherChannel) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   let id;
   const { url } = req;
@@ -132,7 +132,7 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherC
 export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   let id;
   const { url } = req;
@@ -213,7 +213,7 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
 export const getOrders = async (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   let skip = 0;
   let limit = 50;
@@ -258,7 +258,7 @@ export const getOrders = async (req: IncomingMessage, res: ServerResponse) => {
 export const getUserByIdOrName = async (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   let IdOrName;
   const { url } = req;
@@ -298,7 +298,7 @@ export const getUserByIdOrName = async (req: IncomingMessage, res: ServerRespons
 export const createUser = (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   let body = "";
   req.on("data", (chunk) => {
@@ -365,7 +365,7 @@ export const createUser = (req: IncomingMessage, res: ServerResponse) => {
 export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   let body = "";
   req.on("data", (chunk) => {
