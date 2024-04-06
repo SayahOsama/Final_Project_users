@@ -16,12 +16,6 @@ const publisherChannel = new PublisherChannel();
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
   if (req.url.match(/\/api\/user\/orders\/[\w=&?]+/)) {
     if(req.method === "GET"){
       getOrders(req,res);
