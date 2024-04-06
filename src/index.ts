@@ -3,7 +3,6 @@ import * as mongoose from "mongoose";
 import * as dotenv from "dotenv";
 import { createOrder, createUser, deleteOrder, getOrders, getUserByIdOrName, mainRoute, updatePrivileges } from "./routes.js";
 import { PublisherChannel } from './publisher-channel.js';
-import cors from "cors";
 
 // For environment-variables
 dotenv.config();
@@ -17,9 +16,11 @@ const publisherChannel = new PublisherChannel();
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 
-  cors({
-    origin: "https://final-project-gateway.onrender.com"
-  })(req, res, () => {});
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', 'https://final-project-gateway.onrender.com');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   if (req.url.match(/\/api\/user\/orders\/[\w=&?]+/)) {
     if(req.method === "GET"){
