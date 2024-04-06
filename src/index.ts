@@ -17,7 +17,7 @@ const publisherChannel = new PublisherChannel();
 
 // CORS middleware
 app.use(cors({
-  origin: ['https://osama-sayah.github.io','https://final-project-gateway.onrender.com'],
+  origin: ['https://osama-sayah.github.io','https://final-project-gateway.onrender.com','https://osama-sayah.github.io/Final_Project_App/'],
   credentials: true
 }));
 
