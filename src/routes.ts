@@ -148,7 +148,7 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
     }
 
     const bodyKeys = Object.keys(order);
-    if (!bodyKeys.includes("start_date") || !bodyKeys.includes("orderID") || !bodyKeys.includes("eventID") || !bodyKeys.includes("ticketType") || !bodyKeys.includes("ticketQuantity")) {
+    if (!bodyKeys.includes("orderID") || !bodyKeys.includes("eventID") || !bodyKeys.includes("ticketType") || !bodyKeys.includes("ticketQuantity")) {
       res.statusCode = 400;
       res.end("Request body must contain the required fields.");
       return;
@@ -158,7 +158,6 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
     const eventID = order.eventID;
     const ticketType = order.ticketType;
     const ticketQuantity = order.ticketQuantity;
-    const start_date = order.start_date;
    
     try {
       // Find the user by ID
@@ -175,7 +174,6 @@ export const createOrder = (req: IncomingMessage, res: ServerResponse) => {
           eventID: eventID,
           ticketType: ticketType,
           ticketQuantity: ticketQuantity,
-          start_date: start_date,
       };
 
       // Update the user document to push the new order to the orders array
@@ -362,11 +360,7 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
       res.end("Request body must contain only 'username' and 'permission' and 'loggedUserName' fields.");
       return;
     }
-<<<<<<< HEAD
-    // const loggedUser = await User.findById(privilege.userID).select('-orders');
-=======
-    
->>>>>>> 60ef76c78037716fd91994701e1209a938a7d7c6
+
     // Query the User collection for a user with the specified username
     const loggedUserName = privilege.loggedUserName;
     const loggedUser = await User.findOne({ loggedUserName }).select('-orders');
