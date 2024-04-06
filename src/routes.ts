@@ -42,46 +42,6 @@ export const mainRoute = (req: IncomingMessage, res: ServerResponse) => {
   return;
 };
 
-export const getNextEvent = async (req: IncomingMessage, res: ServerResponse) => {
-  let id;
-  const { url } = req;
-  if (url) {
-    const urlParts = url.split("/");
-    const Id = urlParts.indexOf("nextEvent") + 1;
-    id = decodeURIComponent(urlParts[Id]);
-  }
-  try{
-    const currentTime = new Date();
-    // Aggregation pipeline to find the nearest order for the given username
-    const ObjectId = mongoose.Types.ObjectId; // Get the ObjectId constructor
-    const objectId = new ObjectId(id);
-    const nearestOrder = await User.aggregate([
-      { $match: { _id: objectId } }, // Match the user by id
-      { $unwind: '$orders' }, // Deconstruct the orders array
-      { $match: { 'orders.start_date': { $gt: currentTime } } }, // Filter orders with start_date greater than or equal to current time
-      { $sort: { 'orders.start_date': 1 } }, // Sort orders by start_date in ascending order
-      { $limit: 1 }, // Limit to the first order (nearest to the current time)
-      { $project: { _id: null, eventID: '$orders.eventID' } } // Project only the eventID field
-    ]);
-
-    if (nearestOrder.length === 0) {
-      res.statusCode = 404;
-      res.end('No future orders found for the user');
-      return;
-    }
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({eventID: nearestOrder[0].eventID}));
-    return;
-
-  }catch(error){
-    res.statusCode = 400;
-    res.end(error.message);
-    return;
-  }
-};
-
 export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherChannel: PublisherChannel) => {
 
   let id;
