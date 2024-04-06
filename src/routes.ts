@@ -357,12 +357,15 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
     }
 
     const bodyKeys = Object.keys(privilege);
-    if (!bodyKeys.includes("userID") || !bodyKeys.includes("username") || !bodyKeys.includes("permission")) {
+    if (!bodyKeys.includes("loggedUserName") || !bodyKeys.includes("username") || !bodyKeys.includes("permission")) {
       res.statusCode = 400;
       res.end("Request body must contain only 'username' and 'permission' fields.");
       return;
     }
-    const loggedUser = await User.findById(privilege.userID).select('-orders');
+    // const loggedUser = await User.findById(privilege.userID).select('-orders');
+    // Query the User collection for a user with the specified username
+    const loggedUserName = privilege.loggedUserName;
+    const loggedUser = await User.findOne({ loggedUserName }).select('-orders');
     const username = privilege.username;
     const permission = privilege.permission;
     const existingUser = await User.findOne({ username }).select('-orders');
@@ -377,7 +380,6 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
     
-    console.log(loggedUser);
     if(loggedUser.permission && loggedUser.permission != "A"){
       res.statusCode = 403;
       res.end("you lack sufficient permissions to update privilege.");
