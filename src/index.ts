@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import * as mongoose from "mongoose";
 import * as dotenv from "dotenv";
-import { createOrder, createUser, deleteOrder, getOrders, getUserByIdOrName, mainRoute, updatePrivileges,getNextEvent } from "./routes.js";
+import { createOrder, createUser, deleteOrder, getOrders, getUserByIdOrName, mainRoute, updatePrivileges } from "./routes.js";
 import { PublisherChannel } from './publisher-channel.js';
 
 // For environment-variables
@@ -16,13 +16,6 @@ const publisherChannel = new PublisherChannel();
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 
-  if (req.url.match(/\/api\/user\/nextEvent\/\w+/)) {
-    if(req.method === "GET"){
-      getNextEvent(req,res);
-      return;
-    }
-  }
-  
   if (req.url.match(/\/api\/user\/orders\/[\w=&?]+/)) {
     if(req.method === "GET"){
       getOrders(req,res);
