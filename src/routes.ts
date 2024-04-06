@@ -359,10 +359,14 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
     const bodyKeys = Object.keys(privilege);
     if (!bodyKeys.includes("loggedUserName") || !bodyKeys.includes("username") || !bodyKeys.includes("permission")) {
       res.statusCode = 400;
-      res.end("Request body must contain only 'username' and 'permission' fields.");
+      res.end("Request body must contain only 'username' and 'permission' and 'loggedUserName' fields.");
       return;
     }
+<<<<<<< HEAD
     // const loggedUser = await User.findById(privilege.userID).select('-orders');
+=======
+    
+>>>>>>> 60ef76c78037716fd91994701e1209a938a7d7c6
     // Query the User collection for a user with the specified username
     const loggedUserName = privilege.loggedUserName;
     const loggedUser = await User.findOne({ loggedUserName }).select('-orders');
