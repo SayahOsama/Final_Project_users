@@ -31,7 +31,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     }
   }
 
-  if (req.url.match(/\/api\/user\/permissions/)) {
+  if (req.url.match(/\/api\/user\/permission/)) {
     if(req.method === "PUT"){
       updatePrivileges(req,res);
       return;
