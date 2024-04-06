@@ -1,12 +1,12 @@
 import * as mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    orderID: { type: mongoose.Schema.Types.ObjectId, required: true},
+    orderID: { type: String, required: true},
     eventID: { type: mongoose.Schema.Types.ObjectId, required: true},
     ticketType: { type: String, required: true},
     ticketQuantity: { type: Number, required: true},
-    timeOfPurchase: { type: Date, default: Date.now, required: true}
-},{_id: false});
+    timeOfPurchase: { type: Date, default: Date.now, required: true},
+});
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minLength: 1 },
