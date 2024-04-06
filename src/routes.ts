@@ -359,10 +359,10 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
     const bodyKeys = Object.keys(privilege);
     if (!bodyKeys.includes("loggedUserName") || !bodyKeys.includes("username") || !bodyKeys.includes("permission")) {
       res.statusCode = 400;
-      res.end("Request body must contain only 'username' and 'permission' fields.");
+      res.end("Request body must contain only 'username' and 'permission' and 'loggedUserName' fields.");
       return;
     }
-    // const loggedUser = await User.findById(privilege.userID).select('-orders');
+    
     // Query the User collection for a user with the specified username
     const loggedUserName = privilege.loggedUserName;
     const loggedUser = await User.findOne({ loggedUserName }).select('-orders');
@@ -392,7 +392,7 @@ export const updatePrivileges = (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
 
-    if(permission != "M" && permission != "W" && permission != "W"){
+    if(permission != "M" && permission != "W" && permission != "U"){
       res.statusCode = 400;
       res.end("there is no such permission.");
       return;
