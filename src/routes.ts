@@ -86,13 +86,13 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherC
       }
 
       const ObjectId = mongoose.Types.ObjectId; // Get the ObjectId constructor
-      const objectOrderId = new ObjectId(orderToDelete);
+      // const objectOrderId = new ObjectId(orderToDelete);
       const objectId = new ObjectId(id);
 
       const order = await User.aggregate([
         { $match: { _id: objectId } }, // Match the user by ID
         { $unwind: '$orders' }, // Unwind the orders array
-        { $match: { 'orders._id': objectOrderId } } // Match the order by its orderID
+        { $match: { 'orders._id': orderToDelete } } // Match the order by its orderID
       ]);
       if (order.length > 0) {
          // Publish event:
@@ -102,7 +102,7 @@ export const deleteOrder = (req: IncomingMessage, res: ServerResponse,publisherC
       // Update the user document to pull the order from the orders array
       const result = await User.updateOne(
         { _id: objectId }, // Assuming `id` is the user's ID
-        { $pull: { orders: { _id: objectOrderId } } } // Assuming `orderToDelete` is the ID of the order to delete
+        { $pull: { orders: { _id: orderToDelete } } } // Assuming `orderToDelete` is the ID of the order to delete
       );
 
       // Check if the update was successful
