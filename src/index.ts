@@ -23,7 +23,9 @@ app.use(cors({
 // Routes
 app.get('/api/user/orders/:Id', getOrders);
 app.post('/api/user/orders/:Id', createOrder);
-app.delete('/api/user/orders/:Id', deleteOrder);
+app.delete('/api/user/orders/:Id', (req, res) => {
+  deleteOrder(req, res, publisherChannel);
+});
 app.put('/api/user/permission', updatePrivileges);
 app.get('/api/user/:userIdOrName', getUserByIdOrName);
 app.get('/api/user', mainRoute);
