@@ -5,7 +5,7 @@ export class PublisherChannel {
 
   async createChannel() {
     const connection = await amqp.connect(
-      `amqps://mqmsniij:${process.env.AMQPPASS}@cow.rmq2.cloudamqp.com/mqmsniij`
+      `amqps://fptcapra:${process.env.AMQPPASS}@seal.lmq.cloudamqp.com/fptcapra`
     );
     this.channel = await connection.createChannel();
   }
